@@ -45,7 +45,7 @@ METHOD_FN(add_source_potential);
 #define GETTER_FN(nm) godot_variant circuit_get_##nm(GETTER_ARGS)
 GETTER_FN(nodes);
 GETTER_FN(sources);
-GETTER_FN(voltages);
+GETTER_FN(potentials);
 GETTER_FN(currents);
 
 void GDN_EXPORT godot_gdnative_init(godot_gdnative_init_options *options) {
@@ -92,7 +92,7 @@ void GDN_EXPORT godot_nativescript_init(void *handle) {
 \n\
 You MUST initialize this before use, using .init(nodes, sources). Then, \
 use the add_* methods to set up the circuit, and use .solve() to compute \
-a solution, which can be gotten via the properties .voltages (one per \
+a solution, which can be gotten via the properties .potentials (one per \
 node) and .currents (one per source).\n\
 \n\
 At any time, you can call .init() again to create a fresh circuit state, \
@@ -210,12 +210,12 @@ To reverse: add negative potential to the same source.");
 
 	GETTER(INT, int, nodes, -1,,,);
 	GETTER(INT, int, sources, -1,,,);
-	GETTER(POOL_REAL_ARRAY, pool_real_array, voltages, &empty, godot_pool_real_array empty, api->godot_pool_real_array_new(&empty), api->godot_pool_real_array_destroy(&empty));
+	GETTER(POOL_REAL_ARRAY, pool_real_array, potentials, &empty, godot_pool_real_array empty, api->godot_pool_real_array_new(&empty), api->godot_pool_real_array_destroy(&empty));
 	GETTER(POOL_REAL_ARRAY, pool_real_array, currents, &empty, godot_pool_real_array empty, api->godot_pool_real_array_new(&empty), api->godot_pool_real_array_destroy(&empty));
 
 	PROP_DOC(nodes, "Get the number of nodes in the circuit. Prior to .init(), this value is null.");
 	PROP_DOC(sources, "Get the number of sources in the circuit. Prior to .init(), this value is null.");
-	PROP_DOC(voltages, "If the circuit is successfully solved, evaluates to a \
+	PROP_DOC(potentials, "If the circuit is successfully solved, evaluates to a \
 PoolRealArray containing the voltage at every node, as indexed by node \
 number.\n\
 \n\
@@ -402,7 +402,7 @@ GETTER_FN(sources) {
 	return ret;
 }
 
-GETTER_FN(voltages) {
+GETTER_FN(potentials) {
 	PREAMBLE;
 	enum cmna_error error;
 	if(!data->is_init) return ret;
@@ -410,7 +410,7 @@ GETTER_FN(voltages) {
 
 	float *vtg;
 
-	if((error = cmna_circuit_node_voltages(&data->circuit, (void **)&vtg))) {
+	if((error = cmna_circuit_node_potentials(&data->circuit, (void **)&vtg))) {
 		api->godot_variant_new_int(&ret, (int64_t) error);
 		return ret;
 	}
